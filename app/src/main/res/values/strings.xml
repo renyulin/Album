@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">ONE</string>
+    <string name="page_title_pick_picture">select picture</string>
+    <string name="set_as_the_cover">background</string>
+</resources>
