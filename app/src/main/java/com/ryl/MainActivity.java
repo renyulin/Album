@@ -14,12 +14,23 @@ import android.widget.ImageView;
 import com.ryl.choosephoto.ChoosePhotosActivity;
 import com.ryl.choosephoto.ImageItemKeeper;
 import com.ryl.choosephoto.PermissionUtils;
+import com.ryl.wheel.lib.Utils;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity<T> extends AppCompatActivity implements View.OnClickListener {
     private Button camera_btn;
     private ImageView imageView;
 
@@ -29,8 +40,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         camera_btn = (Button) findViewById(R.id.camera_btn);
         imageView = (ImageView) findViewById(R.id.main_image);
+        findViewById(R.id.data_btn).setOnClickListener(this);
         camera_btn.setOnClickListener(this);
+        findViewById(R.id.date_btn).setOnClickListener(this);
 //        Util.isOnMainThread()
+//        timeSchedule();
     }
 
     @Override
@@ -45,6 +59,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 } else {
                     PermissionUtils.requestPermission(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, this, 123);
                 }
+                break;
+            case R.id.date_btn:
+                Utils.setTime(view, this);
+                break;
+            case R.id.data_btn:
+                Utils.setData(view, this);
                 break;
         }
     }
@@ -76,7 +96,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //        allPic();
 //        a();
 //        b();
-        b2();
+//        b2();
+        try {
+            Log.e("aaaaaaaaaaaaaaaaaa", "str：" + getString());
+        } catch (IOException e) {
+            Log.e("aaaaaaaaaaaaaaaaaa", "str：empty");
+            e.printStackTrace();
+        }
+        c();
+    }
+
+    public String getString() throws IOException {
+        InputStreamReader reader = new InputStreamReader(System.in);
+        BufferedReader br = new BufferedReader(reader);
+        String s = br.readLine();
+        return s;
     }
 
     private void allPic() {
@@ -89,8 +123,31 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private int k = 0;
     private List<String> list = new ArrayList<>();
 
+    /**
+     * 插入排休
+     */
+    private void c() {
+        long start = System.nanoTime();
+        for (int i = 1; i < ints.length; i++) {
+            int temp = ints[i];
+            int j = i;
+            while (j > 0 && ints[j - 1] > temp) {
+                ints[j] = ints[j - 1];
+                j--;
+                k++;
+            }
+            ints[j] = temp;
+        }
+        long end = System.nanoTime();
+        Log.e("ssssssssssss", "time:" + k + ";;" + "date:" + (end - start));
+        for (int f : ints) {
+            Log.e("ssssssssssss", "number:" + f);
+        }
+    }
+
     private void a() {//940
         k = 0;
+        long start = System.nanoTime();
         for (int i = 0; i < ints.length - 1; i++) {
             boolean flag = true;
             for (int j = 0; j < ints.length - i - 1; j++) {
@@ -102,7 +159,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
             if (flag) break;
         }
-        Log.e("ssssssssssss", "time:" + k);
+        long end = System.nanoTime();
+        Log.e("ssssssssssss", "time:" + k + ";;" + "date:" + (end - start));
         for (int f : ints) {
             Log.e("ssssssssssss", "number:" + f);
         }
@@ -149,6 +207,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void b2() {
         int i, j, k, l = 0;
+        long start = System.nanoTime();
         for (i = 0; i < ints.length - 1; i++)   // ier loop
         {
             k = i;                     // kimum
@@ -159,10 +218,66 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
             replace(i, k);                // swap them
         }  // end for(i)
-        Log.e("ssssssssssss", "time:" + l);
+        long end = System.nanoTime();
+        Log.e("ssssssssssss", "time:" + l + ";;" + "date:" + (end - start));
         for (int f : ints) {
             Log.e("ssssssssssss", "number:" + f);
         }
+    }
+
+    /**
+     * 定时任务
+     */
+    private void timeSchedule() {
+        ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(10);
+        scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
+            @Override
+            public void run() {
+                time();
+            }
+        }, 1, 1, TimeUnit.SECONDS);
+//        scheduledExecutorService.shutdown();
+    }
+
+    /**
+     * command：执行线程
+     * initialDelay：初始化延时
+     * period：前一次执行结束到下一次执行开始的间隔时间（间隔执行延迟时间）
+     * unit：计时单位
+     */
+    private void time() {
+        SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
+        Date curDate = new Date(System.currentTimeMillis());
+        String time = format.format(curDate);
+        Log.e("currentTimeMillis:", time);
+    }
+
+    /**
+     * 多线程会冲突
+     * delay表示任务延迟多久执行（毫秒级别），
+     * period是周期时间，也就是开始以后，每过多久再去执行一
+     */
+    private void timeSchedule2() {
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                time();
+            }
+        }, 0, 1000);
+//        timer.cancel();
+    }
+
+    interface A {
+
+    }
+
+    interface B {
+
+    }
+
+    interface C extends A, B {
+
     }
 }
 
