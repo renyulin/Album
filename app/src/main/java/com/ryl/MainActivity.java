@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresPermission;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -14,7 +16,7 @@ import android.widget.ImageView;
 import com.ryl.choosephoto.ChoosePhotosActivity;
 import com.ryl.choosephoto.ImageItemKeeper;
 import com.ryl.choosephoto.PermissionUtils;
-import com.ryl.wheel.lib.Utils;
+import com.ryl.reflex.ReflexActivity;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -61,20 +63,41 @@ public class MainActivity<T> extends AppCompatActivity implements View.OnClickLi
                 }
                 break;
             case R.id.date_btn:
-                Utils.setTime(view, this);
+//                Utils.setTime(view, this);
                 break;
             case R.id.data_btn:
-                Utils.setData(view, this);
+                startActivity(new Intent(this, ReflexActivity.class));
+//                Utils.setData(view, this);
+//                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//                    // TODO: Consider calling
+//                    //    ActivityCompat#requestPermissions
+//                    // here to request the missing permissions, and then overriding
+//                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+//                    //                                          int[] grantResults)
+//                    // to handle the case where the user grants the permission. See the documentation
+//                    // for ActivityCompat#requestPermissions for more details.
+//                    return;
+//                }
+////                ActivityCompat.requestPermissions();
+//                getLastKnownLocation("s");
                 break;
         }
     }
+
+    @RequiresPermission(anyOf = {
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.ACCESS_FINE_LOCATION})
+    public void getLastKnownLocation(String provider) {
+
+    }
+
+    ;
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == 123) {
             boolean isAllGranted = true;
-
             // 判断是否所有的权限都已经授予了
             for (int grant : grantResults) {
                 if (grant != PackageManager.PERMISSION_GRANTED) {
